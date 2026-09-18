@@ -1,149 +1,73 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>Face Analysis</title>
-
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
-
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>PSL Score</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
-
 <body>
-
 <div class="container">
 
+  <div id="uploadScreen">
     <div class="header">
-
-        <div class="logo">
-            FA
-        </div>
-
-        <div>
-            <h1>Face Analysis</h1>
-            <p>Эстетический анализ внешности</p>
-        </div>
-
+      <div class="logo">PSL</div>
+      <div>
+        <h1>Face Analysis</h1>
+        <p>PSL · APPIL · Тир</p>
+      </div>
     </div>
-
 
     <div class="card">
-
-        <h2>📸 Анализ фотографии</h2>
-
-        <p class="description">
-            Загрузите фотографию лица для краткого
-            визуального анализа.
-        </p>
-
-        <label
-            class="upload"
-            for="photoInput"
-        >
-
-            <span class="upload-icon">
-                📷
-            </span>
-
-            <span>
-                Выбрать фотографию
-            </span>
-
-        </label>
-
-        <input
-            type="file"
-            id="photoInput"
-            accept="image/*"
-        >
-
-        <img
-            id="preview"
-            class="preview"
-        >
-
-        <button
-            id="analyzeButton"
-            class="primary-button"
-        >
-            🔎 Анализировать
-        </button>
-
+      <h2>Анализ фото</h2>
+      <p class="desc">Загрузи фото лица</p>
+      <label class="upload" for="photoInput">
+        <span class="icon">📷</span>
+        <span>Выбрать фото</span>
+      </label>
+      <input type="file" id="photoInput" accept="image/*">
+      <img id="preview" class="preview">
+      <button id="analyzeBtn" class="btn primary">Анализировать</button>
     </div>
-
-
-    <div
-        id="resultCard"
-        class="card hidden"
-    >
-
-        <h2>📋 Результат</h2>
-
-        <div id="result"></div>
-
-    </div>
-
 
     <div class="card premium">
-
-        <div class="premium-icon">
-            💎
-        </div>
-
-        <h2>Полный анализ</h2>
-
-        <p>
-            Подробный анализ пропорций лица,
-            волос, бороды, кожи и визуальной
-            презентации.
-        </p>
-
-        <ul>
-
-            <li>📐 Пропорции лица</li>
-            <li>🗿 Нижняя челюсть</li>
-            <li>👤 Подбородок</li>
-            <li>👃 Нос</li>
-            <li>👁 Орбитальная область</li>
-            <li>💇 Волосы</li>
-            <li>🧔 Борода</li>
-            <li>✨ Кожа</li>
-            <li>💡 Индивидуальные рекомендации</li>
-
-        </ul>
-
-        <button
-            id="premiumButton"
-            class="premium-button"
-        >
-            💎 Полный анализ — 100 ⭐
-        </button>
-
+      <div class="p-icon">💎</div>
+      <h2>Полный анализ</h2>
+      <p>Конкретные рекомендации</p>
+      <button id="premiumBtn" class="btn premium-btn">100 Stars</button>
     </div>
+  </div>
 
+  <div id="resultScreen" class="hidden">
+    <div class="result-card">
+      <div class="avatar-ring">
+        <img id="resultAvatar" class="avatar" alt="">
+      </div>
+      <div class="label">PSL SCORE</div>
+      <div class="score">
+        <span id="pslNum">0.0</span><span class="max">/10</span>
+      </div>
+      <div class="main-bar"><div id="pslFill" class="fill"></div></div>
 
-    <p class="footer">
-        Анализ является субъективной оценкой
-        визуальных характеристик фотографии.
-    </p>
+      <div class="sec-label">YOUR FEATURES</div>
+      <div id="features"></div>
+
+      <div class="tiers">
+        <span data-t="Sub3">SUB3</span>
+        <span data-t="Sub5">SUB5</span>
+        <span data-t="LTN">LTN</span>
+        <span data-t="MTN">MTN</span>
+        <span data-t="HTN">HTN</span>
+        <span data-t="Chadlite">CHADLITE</span>
+        <span data-t="Chad">CHAD</span>
+      </div>
+
+      <button id="backBtn" class="btn secondary">Новый анализ</button>
+    </div>
+  </div>
 
 </div>
-
-
 <script src="app.js"></script>
-
 </body>
-
 </html>
