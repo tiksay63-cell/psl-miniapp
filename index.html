@@ -10,6 +10,7 @@
 <body>
 <div class="container">
 
+  <!-- Загрузка фото -->
   <div id="uploadScreen">
     <div class="header">
       <div class="logo">PSL</div>
@@ -39,6 +40,28 @@
     </div>
   </div>
 
+  <!-- Сканирование -->
+  <div id="scanScreen" class="hidden">
+    <div class="scan-card">
+      <div class="scan-frame">
+        <img id="scanPreview" class="scan-img" alt="">
+        <div class="scan-line"></div>
+        <div class="scan-corners">
+          <span class="c tl"></span>
+          <span class="c tr"></span>
+          <span class="c bl"></span>
+          <span class="c br"></span>
+        </div>
+      </div>
+      <div class="scan-text">Сканирование лица...</div>
+      <div class="scan-bar">
+        <div class="scan-bar-fill" id="scanBarFill"></div>
+      </div>
+      <div class="scan-hint" id="scanHint">Анализ структуры</div>
+    </div>
+  </div>
+
+  <!-- Результат -->
   <div id="resultScreen" class="hidden">
     <div class="result-card">
       <div class="avatar-ring">
