@@ -1,40 +1,109 @@
-import os
-import tempfile
-from fastapi import FastAPI, UploadFile, File, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from analyzer import analyze_image_structured
+const tg = window.Telegram.WebApp;
+tg.ready();
+tg.expand();
+tg.setHeaderColor("#0b0d12");
+tg.setBackgroundColor("#0b0d12");
 
-app = FastAPI()
+// ========== ВСТАВЬ СВОЮ ССЫЛКУ API ==========
+// Пример: если домен https://face-analysis-web-production-abcd.up.railway.app
+// то пиши так:
+const API_URL = "https://ВСТАВЬ-СВОЙ-ДОМЕН.up.railway.app/analyze";
+// ============================================
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+const photoInput = document.getElementById("photoInput");
+const preview = document.getElementById("preview");
+const analyzeBtn = document.getElementById("analyzeBtn");
+const premiumBtn = document.getElementById("premiumBtn");
+const uploadScreen = document.getElementById("uploadScreen");
+const resultScreen = document.getElementById("resultScreen");
+const resultAvatar = document.getElementById("resultAvatar");
+const pslNum = document.getElementById("pslNum");
+const pslFill = document.getElementById("pslFill");
+const featuresEl = document.getElementById("features");
+const backBtn = document.getElementById("backBtn");
 
-@app.get("/")
-def root():
-    return {"ok": True, "service": "psl-api"}
+let photoData = null;
+let photoFile = null;
 
-@app.post("/analyze")
-async def analyze(file: UploadFile = File(...)):
-    if not file.content_type or not file.content_type.startswith("image/"):
-        raise HTTPException(status_code=400, detail="Нужна картинка")
+photoInput.addEventListener("change", () => {
+  const file = photoInput.files[0];
+  if (!file) return;
+  photoFile = file;
+  const reader = new FileReader();
+  reader.onload = e => {
+    photoData = e.target.result;
+    preview.src = photoData;
+    preview.style.display = "block";
+  };
+  reader.readAsDataURL(file);
+});
 
-    suffix = ".png" if "png" in file.content_type else ".jpg"
+analyzeBtn.addEventListener("click", async () => {
+  if (!photoFile) {
+    tg.showAlert("Сначала выбери фото");
+    return;
+  }
 
-    with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
-        content = await file.read()
-        tmp.write(content)
-        path = tmp.name
+  analyzeBtn.disabled = true;
+  analyzeBtn.textContent = "Анализ...";
 
-    try:
-        data = analyze_image_structured(path)
-        return data
-    except Exception as e:
-        print("API ERROR:", e)
-        raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        if os.path.exists(path):
-            os.remove(path)
+  try {
+    const form = new FormData();
+    form.append("file", photoFile);
+
+    const res = await fetch(API_URL, { method: "POST", body: form });
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err || "Ошибка сервера");
+    }
+    const data = await res.json();
+    showResult(data);
+  } catch (e) {
+    console.error(e);
+    tg.showAlert("Ошибка: " + String(e.message || e));
+  } finally {
+    analyzeBtn.disabled = false;
+    analyzeBtn.textContent = "Анализировать";
+  }
+});
+
+premiumBtn.addEventListener("click", () => {
+  tg.showAlert("Полный анализ — в боте за 100 Stars");
+});
+
+backBtn.addEventListener("click", () => {
+  resultScreen.classList.add("hidden");
+  uploadScreen.classList.remove("hidden");
+});
+
+function showResult(data) {
+  uploadScreen.classList.add("hidden");
+  resultScreen.classList.remove("hidden");
+
+  resultAvatar.src = photoData;
+  const psl = Number(data.psl) || 5;
+  pslNum.textContent = psl.toFixed(1);
+  pslFill.style.width = Math.min(100, psl * 10) + "%";
+
+  const tier = data.tier || "MTN";
+  document.querySelectorAll(".tiers span").forEach(el => {
+    el.classList.toggle("active", el.dataset.t === tier);
+  });
+
+  featuresEl.innerHTML = "";
+  (data.features || []).forEach((f, i) => {
+    const score = Number(f.score) || 5;
+    const row = document.createElement("div");
+    row.className = "feature";
+    row.innerHTML = `
+      <div class="f-name">${f.name}</div>
+      <div class="f-bar"><div class="f-fill" id="b${i}"></div></div>
+      <div class="f-score">${score.toFixed(1)}</div>
+    `;
+    featuresEl.appendChild(row);
+    setTimeout(() => {
+      const el = document.getElementById("b" + i);
+      if (el) el.style.width = Math.min(100, score * 10) + "%";
+    }, 80 + i * 70);
+  });
+}
