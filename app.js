@@ -44,6 +44,7 @@ analyzeBtn.addEventListener("click", async () => {
     return;
   }
 
+  // Показать экран сканирования
   uploadScreen.classList.add("hidden");
   resultScreen.classList.add("hidden");
   scanScreen.classList.remove("hidden");
