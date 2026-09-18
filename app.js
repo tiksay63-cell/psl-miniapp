@@ -4,23 +4,23 @@ tg.expand();
 tg.setHeaderColor("#0b0d12");
 tg.setBackgroundColor("#0b0d12");
 
-// ========== ВСТАВЬ СВОЮ ССЫЛКУ API ==========
-// Пример: если домен https://face-analysis-web-production-abcd.up.railway.app
-// то пиши так:
-const API_URL = "https://ВСТАВЬ-СВОЙ-ДОМЕН.up.railway.app/analyze";
-// ============================================
+const API_URL = "https://face-analysis-web-production.up.railway.app/analyze";
 
 const photoInput = document.getElementById("photoInput");
 const preview = document.getElementById("preview");
 const analyzeBtn = document.getElementById("analyzeBtn");
 const premiumBtn = document.getElementById("premiumBtn");
 const uploadScreen = document.getElementById("uploadScreen");
+const scanScreen = document.getElementById("scanScreen");
 const resultScreen = document.getElementById("resultScreen");
 const resultAvatar = document.getElementById("resultAvatar");
 const pslNum = document.getElementById("pslNum");
 const pslFill = document.getElementById("pslFill");
 const featuresEl = document.getElementById("features");
 const backBtn = document.getElementById("backBtn");
+const scanPreview = document.getElementById("scanPreview");
+const scanBarFill = document.getElementById("scanBarFill");
+const scanHint = document.getElementById("scanHint");
 
 let photoData = null;
 let photoFile = null;
@@ -44,8 +44,31 @@ analyzeBtn.addEventListener("click", async () => {
     return;
   }
 
+  uploadScreen.classList.add("hidden");
+  resultScreen.classList.add("hidden");
+  scanScreen.classList.remove("hidden");
+  scanPreview.src = photoData;
+  scanBarFill.style.width = "8%";
+  scanHint.textContent = "Анализ структуры";
+
+  const hints = [
+    "Анализ структуры",
+    "Оценка челюсти",
+    "Разбор глаз и носа",
+    "Подсчёт PSL",
+    "Финальная оценка"
+  ];
+  let hintIndex = 0;
+  let progress = 8;
+
+  const progressTimer = setInterval(() => {
+    progress = Math.min(progress + Math.random() * 12, 90);
+    scanBarFill.style.width = progress + "%";
+    hintIndex = Math.min(hintIndex + 1, hints.length - 1);
+    scanHint.textContent = hints[hintIndex];
+  }, 900);
+
   analyzeBtn.disabled = true;
-  analyzeBtn.textContent = "Анализ...";
 
   try {
     const form = new FormData();
@@ -57,9 +80,21 @@ analyzeBtn.addEventListener("click", async () => {
       throw new Error(err || "Ошибка сервера");
     }
     const data = await res.json();
-    showResult(data);
+
+    clearInterval(progressTimer);
+    scanBarFill.style.width = "100%";
+    scanHint.textContent = "Готово";
+
+    setTimeout(() => {
+      scanScreen.classList.add("hidden");
+      showResult(data);
+    }, 450);
+
   } catch (e) {
+    clearInterval(progressTimer);
     console.error(e);
+    scanScreen.classList.add("hidden");
+    uploadScreen.classList.remove("hidden");
     tg.showAlert("Ошибка: " + String(e.message || e));
   } finally {
     analyzeBtn.disabled = false;
@@ -73,11 +108,14 @@ premiumBtn.addEventListener("click", () => {
 
 backBtn.addEventListener("click", () => {
   resultScreen.classList.add("hidden");
+  scanScreen.classList.add("hidden");
   uploadScreen.classList.remove("hidden");
+  scanBarFill.style.width = "0%";
 });
 
 function showResult(data) {
   uploadScreen.classList.add("hidden");
+  scanScreen.classList.add("hidden");
   resultScreen.classList.remove("hidden");
 
   resultAvatar.src = photoData;
